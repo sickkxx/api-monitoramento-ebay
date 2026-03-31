@@ -5,8 +5,8 @@ from database import salvar_produtos, listar_produtos
 app: FastAPI = FastAPI()
 
 @app.get('/buscar/{produto}')
-def buscar(produto: str):
-    resultado = ebay_scraper(produto)
+def buscar(produto: str) -> dict[str, str | int]:
+    resultado: list[dict[str, str | float | object]] = ebay_scraper(produto)
 
     for item in resultado:
         salvar_produtos(
@@ -20,5 +20,5 @@ def buscar(produto: str):
     return {"msg": "Dados salvos", "quantidade": len(resultado)}
 
 @app.get("/produtos")
-def produtos():
+def produtos() -> list:
     return listar_produtos()
