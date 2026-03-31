@@ -4,7 +4,7 @@ def conectar() -> "mysql.connector.connection.MySQLConnection":
     return mysql.connector.connect(
         host="localhost",
         user="root",
-        password="ta123",
+        password="SUA_SENHA",
         database="ebay_produtos"
     )
 
