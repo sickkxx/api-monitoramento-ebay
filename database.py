@@ -1,18 +1,18 @@
 import mysql.connector
 
-def conectar() -> "mysql.connector.connection.MySQLConnection":
+def conectar():
     return mysql.connector.connect(
         host="localhost",
         user="root",
-        password="SUA_SENHA",
+        password="ta123",
         database="ebay_produtos"
     )
 
-def salvar_produtos(produto: str, preco: float, vendedor: str, link: str, data_coleta: object) -> None:
-    conn: "mysql.connector.connection.MySQLConnection" = conectar()
-    cursor: "mysql.connector.cursor.MySQLCursor" = conn.cursor()
+def salvar_produtos(produto, preco, vendedor, link, data_coleta):
+    conn = conectar()
+    cursor = conn.cursor()
 
-    query: str = """INSERT INTO produtos (produto, preco, vendedor, link, data_coleta) VALUES (%s, %s, %s, %s, %s)"""
+    query = """INSERT IGNORE INTO produtos (produto, preco, vendedor, link, data_coleta) VALUES (%s, %s, %s, %s, %s)"""
 
     cursor.execute(query, (produto, preco, vendedor, link, data_coleta))
     conn.commit()
@@ -20,13 +20,13 @@ def salvar_produtos(produto: str, preco: float, vendedor: str, link: str, data_c
     cursor.close()
     conn.close()
 
-def listar_produtos() -> list[dict]:
-    conn: "mysql.connector.connection.MySQLConnection" = conectar()
-    cursor: "mysql.connector.cursor.MySQLCursorDict" = conn.cursor(dictionary=True)
+def listar_produtos():
+    conn = conectar()
+    cursor = conn.cursor(dictionary=True)
 
     cursor.execute("""SELECT * FROM produtos""")
 
-    resultados: list[dict] = cursor.fetchall()
+    resultados = cursor.fetchall()
 
     cursor.close()
     conn.close()
