@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from scrapper import ebay_scraper
-from database import salvar_produtos, listar_produtos
+from projetos.ebay_scrapper.db.repository import salvar_produtos, listar_produtos
 
 app: FastAPI = FastAPI()
 
@@ -20,5 +20,6 @@ def buscar(produto: str) -> dict[str, str | int]:
     return {"msg": "Dados salvos", "quantidade": len(resultado)}
 
 @app.get("/produtos")
-def produtos() -> list:
-    return listar_produtos()
+def produtos():
+    df = listar_produtos()
+    return df.to_dict(orient="records")
