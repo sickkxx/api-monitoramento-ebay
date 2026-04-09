@@ -20,37 +20,29 @@ class EbayScraper:
 
         self.driver.get("https://www.ebay.com/")
 
-        # Esperando o elemento aparecer
         WebDriverWait(self.driver, 5).until(
             EC.presence_of_element_located((By.ID, "gh-ac"))
         )
 
-        # Pegando a barra de pesquisa e fazendo a busca
         barra_pesquisa: WebElement = self.driver.find_element(By.ID, "gh-ac")
         barra_pesquisa.send_keys(produto)
         barra_pesquisa.send_keys(Keys.ENTER)
 
-        # Esperando o elemento aparecer
         WebDriverWait(self.driver, 5).until(
             EC.presence_of_all_elements_located((By.CLASS_NAME, "s-card__link"))
         )
 
-        # Rola a página até o final para carregar tudo
         for _ in range(5):
             self.driver.execute_script("window.scrollTo(0, document.documentElement.scrollHeight);")
             sleep(1)
 
-        # Pegando todos links dos produtos
         links_produto: list[WebElement] = self.driver.find_elements(By.CLASS_NAME, "s-card__link")
 
-        # Usa set para evitar links duplicados
         links = set()
 
-        # Adicionando os link em uma lista
         for link in links_produto:
             url = link.get_attribute("href")
 
-            # Ignora links inválidos ou com parâmetros desnecessários
             if not url or "?itmmeta=" in url:
                 continue
 
