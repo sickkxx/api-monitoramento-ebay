@@ -2,10 +2,10 @@ from time import sleep
 from datetime import datetime
 from bs4 import BeautifulSoup
 from selenium import webdriver
+from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
-from selenium.webdriver.remote.webelement import WebElement
-from selenium.webdriver.firefox.options import Options
+from selenium.webdriver.edge.options import Options
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
@@ -13,30 +13,33 @@ class EbayScraper:
     def __init__(self):
         options = Options()
         options.add_argument("--headless")
-        self.driver = webdriver.Firefox(options=options)
+        self.driver = webdriver.Edge(options=options)
+        self.wait = WebDriverWait(self.driver, 10)
 
-    def buscar(self, produto: str) -> list:
-        resultado = []
-
+    def iniciar(self):
         self.driver.get("https://www.ebay.com/")
 
-        WebDriverWait(self.driver, 5).until(
-            EC.presence_of_element_located((By.ID, "gh-ac"))
-        )
+    def pesquisar_produtos(self, produto):
+        try:
+            barra_pesquisa = self.wait.until(
+                EC.element_to_be_clickable((By.ID, "gh-ac"))
+            )
+            barra_pesquisa.send_keys(produto)
+            barra_pesquisa.send_keys(Keys.ENTER)
 
-        barra_pesquisa: WebElement = self.driver.find_element(By.ID, "gh-ac")
-        barra_pesquisa.send_keys(produto)
-        barra_pesquisa.send_keys(Keys.ENTER)
+        except TimeoutException:
+            pass
 
-        WebDriverWait(self.driver, 5).until(
-            EC.presence_of_all_elements_located((By.CLASS_NAME, "s-card__link"))
-        )
+    def produtos(self) -> list:
+        resultado = []
 
         for _ in range(5):
-            self.driver.execute_script("window.scrollTo(0, document.documentElement.scrollHeight);")
-            sleep(1)
+            self.driver.execute_script("window.scrollBy(0, 1000);")
+            sleep(0.8)
 
-        links_produto: list[WebElement] = self.driver.find_elements(By.CLASS_NAME, "s-card__link")
+        links_produto = self.wait.until(
+            EC.presence_of_all_elements_located((By.CLASS_NAME, "s-card__link"))
+        )
 
         links = set()
 
@@ -63,7 +66,6 @@ class EbayScraper:
             preco_tag = soup.select_one(".x-price-approx__price")
 
             preco = preco_tag.text
-            # Remove formatos brasileiros para converter em float
             preco = preco.replace("R$", "").replace(".", "").replace(",", ".").strip()
             preco = float(preco)
 
