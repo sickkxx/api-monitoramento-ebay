@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from scrapper import EbayScraper
 from db.repository import ProdutoRepository
 
-app: FastAPI = FastAPI()
+app = FastAPI()
 
 @app.get('/buscar/{produto}')
 def buscar(produto):
