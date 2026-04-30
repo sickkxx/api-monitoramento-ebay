@@ -5,7 +5,7 @@ from db.repository import ProdutoRepository
 app: FastAPI = FastAPI()
 
 @app.get('/buscar/{produto}')
-def buscar(produto: str) -> dict[str, str | int]:
+def buscar(produto):
     repo = ProdutoRepository()
     bot_scrap = EbayScraper()
 
