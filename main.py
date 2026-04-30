@@ -7,21 +7,24 @@ app: FastAPI = FastAPI()
 @app.get('/buscar/{produto}')
 def buscar(produto: str) -> dict[str, str | int]:
     repo = ProdutoRepository()
-    scrap = EbayScraper()
+    bot_scrap = EbayScraper()
 
     try:
-        resultado = scrap.buscar(produto)
+        bot_scrap.iniciar()
+        bot_scrap.pesquisar_produtos(produto)
 
-        for item in resultado:
+        produtos = bot_scrap.produtos()
+
+        for item in produtos:
             repo.salvar(**item)
 
     finally:
-        scrap.fechar()
+        bot_scrap.fechar()
 
-    return {"msg": "Dados salvos", "quantidade": len(resultado)}
+    return {"msg": "Dados salvos", "quantidade": len(produtos)}
 
 @app.get("/produtos")
-def produtos():
-    listar_produtos = ProdutoRepository()
-    df = listar_produtos.listar()
+def listar_produtos():
+    produtos = ProdutoRepository()
+    df = produtos.listar()
     return df.to_dict(orient="records")
